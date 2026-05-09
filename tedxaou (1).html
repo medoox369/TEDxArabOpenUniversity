@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEDxAOU — Ideas Worth Spreading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --red:      #EB0028;
+  --red-dim:  #8B0015;
+  --white:    #F5F2EE;
+  --offwhite: #C8C3BC;
+  --gray:     #3A3631;
+  --dark:     #0A0907;
+  --black:    #000000;
+  --glass:    rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glow-red:  0 0 40px rgba(235,0,40,0.35), 0 0 80px rgba(235,0,40,0.15);
+  --glow-soft: 0 0 60px rgba(255,255,255,0.05);
+
+  /* Platform colors */
+  --fb:  #1877F2;
+  --ig:  #E1306C;
+  --li:  #0A66C2;
+  --tt:  #00F2EA;
+  --yt:  #FF0000;
+  --web: #EB0028;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+body.loaded { }
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+#cursor {
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  pointer-events: none;
+}
+#cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  transition: width .15s, height .15s, background .2s;
+}
+#cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(235,0,40,0.6);
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  transition: width .3s ease, height .3s ease, border-color .3s ease, transform .08s linear;
+}
+body:has(a:hover) #cursor-ring,
+body:has(button:hover) #cursor-ring,
+body:has(.card:hover) #cursor-ring {
+  width: 56px; height: 56px;
+  border-color: rgba(235,0,40,1);
+  background: rgba(235,0,40,0.05);
+}
+
+/* ============================================================
+   MOUSE ORB
+   ============================================================ */
+#mouse-orb {
+  position: fixed; top: 0; left: 0; z-index: 1;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(235,0,40,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%,-50%);
+  transition: transform .12s ease;
+}
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+#loader {
+  position: fixed; inset: 0; z-index: 10000;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 32px;
+  transition: opacity .8s ease, visibility .8s ease;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+
+.loader-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: 0.08em;
+  color: var(--white);
+  position: relative;
+}
+.loader-logo span { color: var(--red); }
+
+.loader-bar-wrap {
+  width: 200px; height: 1px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  background: var(--red);
+  width: 0%;
+  transition: width 1.6s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 12px var(--red);
+}
+.loader-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   CANVAS PARTICLES
+   ============================================================ */
+#particles-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   NOISE TEXTURE OVERLAY
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 2;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+#scroll-indicator {
+  position: fixed; right: 28px; top: 50%; z-index: 100;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 6px;
+  align-items: center;
+}
+.scroll-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all .4s ease;
+}
+.scroll-dot.active {
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  height: 20px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 20px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+  backdrop-filter: blur(0px);
+  transition: background .4s, backdrop-filter .4s;
+}
+nav.scrolled {
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--red); }
+.nav-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: color .3s;
+}
+.nav-link:hover { color: var(--white); }
+
+/* ============================================================
+   SECTIONS WRAPPER
+   ============================================================ */
+main { position: relative; z-index: 10; }
+
+section {
+  min-height: auto;
+  position: relative;
+}
+
+#hero {
+  min-height: 100vh;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  overflow: hidden;
+}
+
+/* Ambient mesh gradient */
+.hero-mesh {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(235,0,40,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(235,0,40,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(235,0,40,0.04) 0%, transparent 70%);
+  animation: meshPulse 8s ease-in-out infinite alternate;
+}
+@keyframes meshPulse {
+  from { opacity: 0.8; }
+  to   { opacity: 1.2; }
+}
+
+/* Floating geometric shapes */
+.geo {
+  position: absolute;
+  border: 1px solid rgba(235,0,40,0.12);
+  border-radius: 50%;
+  animation: geoFloat linear infinite;
+}
+.geo-1 { width: 600px; height: 600px; top: -200px; right: -200px; animation-duration: 25s; }
+.geo-2 { width: 300px; height: 300px; bottom: 0; left: -100px; animation-duration: 18s; animation-direction: reverse; border-color: rgba(235,0,40,0.08); }
+.geo-3 { width: 120px; height: 120px; top: 30%; right: 15%; animation-duration: 12s; border-color: rgba(255,255,255,0.06); }
+.geo-4 { width: 60px; height: 60px; top: 20%; left: 10%; animation-duration: 9s; border-radius: 0; transform: rotate(45deg); border-color: rgba(235,0,40,0.2); }
+
+@keyframes geoFloat {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-30px) rotate(180deg); }
+  100% { transform: translateY(0px) rotate(360deg); }
+}
+
+/* Hero content */
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp .8s .4s forwards;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 18vw, 220px);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  position: relative;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUp 1s .6s forwards;
+}
+.hero-title .red { color: var(--red); }
+.hero-title .stroke {
+  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+  color: transparent;
+}
+
+.hero-sub {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(24px, 4vw, 52px);
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp .8s .8s forwards;
+}
+
+.hero-desc {
+  max-width: 500px;
+  margin: 20px auto 0;
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.7;
+  color: rgba(255,255,255,0.42);
+  font-weight: 300;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp .8s 1s forwards;
+}
+
+.hero-divider {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(235,0,40,0.6), transparent);
+  margin: 24px auto;
+  opacity: 0;
+  animation: fadeIn .8s 1.2s forwards;
+}
+
+.hero-ctas {
+  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp .8s 1.3s forwards;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 32px;
+  border-radius: 2px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.08);
+  transform: translateX(-100%);
+  transition: transform .4s ease;
+}
+.btn:hover::before { transform: translateX(0); }
+.btn:hover { transform: translateY(-2px); }
+
+.btn-primary {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 0 30px rgba(235,0,40,0.3);
+}
+.btn-primary:hover {
+  box-shadow: 0 0 50px rgba(235,0,40,0.5), 0 8px 30px rgba(235,0,40,0.3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.btn-ghost:hover {
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 0 30px rgba(255,255,255,0.05), 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* ============================================================
+   SCROLL ARROW
+   ============================================================ */
+.scroll-arrow {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: bounceArrow 2s ease-in-out infinite;
+  opacity: 0;
+  animation: fadeIn 1s 2s forwards, bounceArrow 2s 3s ease-in-out infinite;
+}
+.scroll-arrow span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+.arrow-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, rgba(235,0,40,0.6), transparent);
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse {
+  0%, 100% { transform: scaleY(1); opacity: 1; }
+  50%       { transform: scaleY(0.6); opacity: 0.4; }
+}
+@keyframes bounceArrow {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ============================================================
+   MANIFESTO SECTION
+   ============================================================ */
+#manifesto {
+  min-height: auto;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.manifesto-inner {
+  max-width: 900px;
+  text-align: center;
+}
+.manifesto-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(235,0,40,0.7);
+  margin-bottom: 32px;
+  display: block;
+}
+.manifesto-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 80px);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: var(--white);
+}
+.manifesto-text .highlight {
+  -webkit-text-stroke: 1px var(--red);
+  color: transparent;
+}
+
+/* Horizontal line */
+.section-rule {
+  width: 100%; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(235,0,40,0.3) 30%, rgba(235,0,40,0.3) 70%, transparent);
+  margin: 0;
+}
+
+/* ============================================================
+   PLATFORMS / SOCIAL CARDS
+   ============================================================ */
+#platforms {
+  padding: 80px 40px 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 52px;
+}
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(235,0,40,0.7);
+  display: block;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 7vw, 88px);
+  letter-spacing: 0.04em;
+  color: var(--white);
+  line-height: 1;
+}
+
+/* Grid — 3 col desktop, 2 tablet, 1 mobile */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Card */
+.card {
+  position: relative;
+  padding: 32px 26px 48px;
+  border-radius: 6px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  text-decoration: none;
+  color: var(--white);
+  overflow: hidden;
+  cursor: none;
+  /* Min tap target height on mobile */
+  min-height: 180px;
+  transition:
+    transform .4s cubic-bezier(0.16,1,0.3,1),
+    box-shadow .4s ease,
+    border-color .4s ease;
+
+  opacity: 0;
+  transform: translateY(40px);
+}
+.card.visible {
+  animation: cardReveal .7s ease forwards;
+}
+@keyframes cardReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow overlay */
+.card-glow {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+}
+
+.card:hover { transform: translateY(-8px) scale(1.015); }
+.card:hover .card-glow { opacity: 1; }
+.card:hover .card-icon-wrap { transform: scale(1.12) rotate(-5deg); }
+.card:hover .card-arrow { transform: translateX(4px); opacity: 1; }
+
+/* Per-platform colors */
+.card[data-p="website"]  { --c: var(--web); }
+.card[data-p="facebook"] { --c: var(--fb); }
+.card[data-p="instagram"]{ --c: var(--ig); }
+.card[data-p="linkedin"] { --c: var(--li); }
+.card[data-p="tiktok"]   { --c: var(--tt); }
+.card[data-p="youtube"]  { --c: var(--yt); }
+.card { --c: #fff; }
+
+.card:hover { border-color: var(--c); }
+.card[data-p="website"]:hover  { box-shadow: 0 0 40px rgba(235,0,40,0.2),    0 20px 60px rgba(0,0,0,0.6); }
+.card[data-p="facebook"]:hover { box-shadow: 0 0 40px rgba(24,119,242,0.25), 0 20px 60px rgba(0,0,0,0.6); }
+.card[data-p="instagram"]:hover{ box-shadow: 0 0 40px rgba(225,48,108,0.25), 0 20px 60px rgba(0,0,0,0.6); }
+.card[data-p="linkedin"]:hover { box-shadow: 0 0 40px rgba(10,102,194,0.25), 0 20px 60px rgba(0,0,0,0.6); }
+.card[data-p="tiktok"]:hover   { box-shadow: 0 0 40px rgba(0,242,234,0.2),   0 20px 60px rgba(0,0,0,0.6); }
+.card[data-p="youtube"]:hover  { box-shadow: 0 0 40px rgba(255,0,0,0.25),    0 20px 60px rgba(0,0,0,0.6); }
+
+.card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--c) 0%, transparent 70%); opacity: 0; }
+.card[data-p="website"]  .card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(235,0,40,0.15) 0%, transparent 70%); }
+.card[data-p="facebook"] .card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(24,119,242,0.15) 0%, transparent 70%); }
+.card[data-p="instagram"].card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(225,48,108,0.15) 0%, transparent 70%); }
+.card[data-p="linkedin"] .card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(10,102,194,0.15) 0%, transparent 70%); }
+.card[data-p="tiktok"]   .card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0,242,234,0.12) 0%, transparent 70%); }
+.card[data-p="youtube"]  .card-glow { background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255,0,0,0.15) 0%, transparent 70%); }
+
+/* Card neon line at top */
+.card::after {
+  content: '';
+  position: absolute; top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--c-line, rgba(235,0,40,0.9)), transparent);
+  opacity: 0;
+  transition: opacity .4s ease, left .4s ease, right .4s ease;
+}
+.card:hover::after { opacity: 1; left: 5%; right: 5%; }
+.card[data-p="website"]::after  { --c-line: rgba(235,0,40,0.9); }
+.card[data-p="facebook"]::after { --c-line: rgba(24,119,242,0.9); }
+.card[data-p="instagram"]::after{ --c-line: rgba(225,48,108,0.9); }
+.card[data-p="linkedin"]::after { --c-line: rgba(10,102,194,0.9); }
+.card[data-p="tiktok"]::after   { --c-line: rgba(0,242,234,0.9); }
+.card[data-p="youtube"]::after  { --c-line: rgba(255,0,0,0.9); }
+
+/* Icon wrapper — ensures consistent sizing & animation origin */
+.card-icon-wrap {
+  width: 48px; height: 48px;
+  margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .4s cubic-bezier(0.16,1,0.3,1);
+  flex-shrink: 0;
+}
+.card-icon {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+.card-platform {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-platform::before {
+  content: '';
+  display: block;
+  width: 14px; height: 1px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.card[data-p="website"]  .card-platform { color: #EB0028; }
+.card[data-p="facebook"] .card-platform { color: #1877F2; }
+.card[data-p="instagram"].card-platform { color: #E1306C; }
+.card[data-p="linkedin"] .card-platform { color: #0A66C2; }
+.card[data-p="tiktok"]   .card-platform { color: #00F2EA; }
+.card[data-p="youtube"]  .card-platform { color: #FF0000; }
+
+.card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+
+.card-handle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.32);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.card-arrow {
+  position: absolute; bottom: 24px; right: 24px;
+  opacity: 0.28;
+  transition: transform .3s ease, opacity .3s ease;
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1;
+}
+
+/* Mobile card layout improvements */
+@media (max-width: 900px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .cards-grid { grid-template-columns: 1fr; gap: 10px; }
+  .card { padding: 24px 20px 44px; min-height: 140px; }
+  .card-icon-wrap { width: 40px; height: 40px; margin-bottom: 14px; }
+  .card-name { font-size: 24px; }
+}
+
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  padding: 60px 40px 48px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+  z-index: 10;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.12em;
+  color: var(--white);
+}
+.footer-logo span { color: var(--red); }
+
+.footer-tagline {
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+.footer-socials {
+  display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+}
+.footer-social {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  color: rgba(255,255,255,0.4);
+  transition: color .3s, border-color .3s, box-shadow .3s;
+  cursor: none;
+}
+.footer-social:hover {
+  color: var(--white);
+  border-color: rgba(235,0,40,0.5);
+  box-shadow: 0 0 16px rgba(235,0,40,0.2);
+}
+.footer-social svg { width: 16px; height: 16px; }
+
+.footer-copy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.15);
+}
+.footer-copy a { color: rgba(235,0,40,0.5); text-decoration: none; }
+
+/* ============================================================
+   UTILITIES / ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .8s ease, transform .8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  nav { padding: 16px 20px; }
+  #platforms { padding: 60px 16px 80px; }
+  #manifesto { padding: 64px 20px; }
+  footer { padding: 48px 20px; }
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  #scroll-indicator { display: none; }
+  .hero-ctas { gap: 12px; }
+  .btn { padding: 13px 24px; font-size: 12px; }
+}
+@media (max-width: 420px) {
+  .hero-ctas { flex-direction: column; align-items: center; }
+}
+
+/* Hide cursor on touch */
+@media (hover: none) {
+  #cursor, #mouse-orb { display: none !important; }
+  body { cursor: auto; }
+  .btn, .card, a, .footer-social { cursor: pointer; }
+}
+
+/* Sound wave decorative */
+.wave-bars {
+  display: flex; align-items: center; gap: 3px;
+  justify-content: center;
+  margin: 48px auto 0;
+  height: 32px;
+}
+.wave-bar {
+  width: 2px;
+  background: var(--red);
+  border-radius: 2px;
+  opacity: 0.6;
+  animation: waveBar .8s ease-in-out infinite alternate;
+}
+.wave-bar:nth-child(1) { height: 8px;  animation-delay: 0s; }
+.wave-bar:nth-child(2) { height: 20px; animation-delay: .1s; }
+.wave-bar:nth-child(3) { height: 14px; animation-delay: .2s; }
+.wave-bar:nth-child(4) { height: 28px; animation-delay: .15s; }
+.wave-bar:nth-child(5) { height: 10px; animation-delay: .25s; }
+.wave-bar:nth-child(6) { height: 24px; animation-delay: .05s; }
+.wave-bar:nth-child(7) { height: 18px; animation-delay: .3s; }
+.wave-bar:nth-child(8) { height: 6px;  animation-delay: .2s; }
+.wave-bar:nth-child(9) { height: 22px; animation-delay: .1s; }
+.wave-bar:nth-child(10){ height: 12px; animation-delay: .35s; }
+.wave-bar:nth-child(11){ height: 28px; animation-delay: 0s; }
+.wave-bar:nth-child(12){ height: 16px; animation-delay: .15s; }
+@keyframes waveBar {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(2.2); }
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor">
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+</div>
+
+<!-- Mouse Orb -->
+<div id="mouse-orb"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-logo">TEDx<span>AOU</span></div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-text" id="loader-text">Initializing experience…</div>
+</div>
+
+<!-- Particles Canvas -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- Scroll Indicator -->
+<div id="scroll-indicator">
+  <div class="scroll-dot active" data-section="0"></div>
+  <div class="scroll-dot" data-section="1"></div>
+  <div class="scroll-dot" data-section="2"></div>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">TEDx<span>AOU</span></a>
+  <a href="https://tedxaou.com/" target="_blank" rel="noopener" class="nav-link">Visit Website ↗</a>
+</nav>
+
+<main>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <div class="hero-mesh"></div>
+    <div class="geo geo-1"></div>
+    <div class="geo geo-2"></div>
+    <div class="geo geo-3"></div>
+    <div class="geo geo-4"></div>
+
+    <div class="hero-eyebrow">Arab Open University × TED Global Program</div>
+
+    <h1 class="hero-title">
+      TEDx<span class="red">AOU</span>
+    </h1>
+
+    <p class="hero-sub">Ideas Worth Spreading</p>
+
+    <p class="hero-desc">
+      We are part of the global TEDx program aiming to spread knowledge, inspiration, and ideas worth sharing within our community and beyond.
+    </p>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-ctas">
+      <a href="#platforms" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Follow Us
+      </a>
+      <a href="#platforms" class="btn btn-ghost">
+        Explore Platforms
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </a>
+    </div>
+
+    <div class="scroll-arrow">
+      <div class="arrow-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ===== PLATFORMS ===== -->
+  <section id="platforms">
+    <div class="section-header reveal">
+      <span class="section-label">Connect With Us</span>
+      <h2 class="section-title">Our Platforms</h2>
+    </div>
+
+    <div class="cards-grid">
+
+      <!-- Facebook -->
+      <a class="card" data-p="facebook" href="https://www.facebook.com/TEDxArabOpenUniversity" target="_blank" rel="noopener" style="animation-delay:.08s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+          </svg>
+        </div>
+        <span class="card-platform">Facebook</span>
+        <div class="card-name">Facebook</div>
+        <div class="card-handle">TEDxArabOpenUniversity</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <!-- Instagram — full brand-accurate icon -->
+      <a class="card" data-p="instagram" href="https://www.instagram.com/tedx.aou" target="_blank" rel="noopener" style="animation-delay:.16s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none">
+            <!-- Outer rounded square -->
+            <rect x="2" y="2" width="20" height="20" rx="6" ry="6" stroke="currentColor" stroke-width="1.5"/>
+            <!-- Inner circle (lens) -->
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.5"/>
+            <!-- Dot (flash) -->
+            <circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="card-platform">Instagram</span>
+        <div class="card-name">Instagram</div>
+        <div class="card-handle">@tedx.aou</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <!-- Website -->
+      <a class="card" data-p="website" href="https://tedxaou.com/" target="_blank" rel="noopener" style="animation-delay:0s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9.5"/>
+            <path d="M2.5 12h19"/>
+            <path d="M12 2.5C9.5 6 8 9 8 12s1.5 6 4 9.5"/>
+            <path d="M12 2.5C14.5 6 16 9 16 12s-1.5 6-4 9.5"/>
+            <path d="M3.5 7.5C5.5 8.8 8.6 9.5 12 9.5s6.5-.7 8.5-2"/>
+            <path d="M3.5 16.5C5.5 15.2 8.6 14.5 12 14.5s6.5.7 8.5 2"/>
+          </svg>
+        </div>
+        <span class="card-platform">Official</span>
+        <div class="card-name">Website</div>
+        <div class="card-handle">tedxaou.com</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <!-- LinkedIn -->
+      <a class="card" data-p="linkedin" href="https://www.linkedin.com/company/tedxaou/" target="_blank" rel="noopener" style="animation-delay:.24s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+        </div>
+        <span class="card-platform">LinkedIn</span>
+        <div class="card-name">LinkedIn</div>
+        <div class="card-handle">tedxaou</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <!-- TikTok -->
+      <a class="card" data-p="tiktok" href="https://www.tiktok.com/@tedxaou" target="_blank" rel="noopener" style="animation-delay:.32s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.78 1.53V6.79a4.85 4.85 0 0 1-1.01-.1z"/>
+          </svg>
+        </div>
+        <span class="card-platform">TikTok</span>
+        <div class="card-name">TikTok</div>
+        <div class="card-handle">@tedxaou</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <!-- YouTube -->
+      <a class="card" data-p="youtube" href="https://www.youtube.com/@TEDxAOU" target="_blank" rel="noopener" style="animation-delay:.40s">
+        <div class="card-glow"></div>
+        <div class="card-icon-wrap">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
+            <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#000"/>
+          </svg>
+        </div>
+        <span class="card-platform">YouTube</span>
+        <div class="card-name">YouTube</div>
+        <div class="card-handle">@TEDxAOU</div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ===== MANIFESTO ===== -->
+  <div class="section-rule"></div>
+  <section id="manifesto">
+    <div class="manifesto-inner">
+      <span class="manifesto-tag reveal">Our Mission</span>
+      <h2 class="manifesto-text reveal">
+        One Idea.<br>
+        <span class="highlight">Infinite</span> Ripples.
+      </h2>
+      <div class="wave-bars reveal">
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      </div>
+    </div>
+  </section>
+  <div class="section-rule"></div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">TEDx<span>AOU</span></div>
+    <p class="footer-tagline">"Ideas Worth Spreading"</p>
+
+    <div class="footer-socials">
+      <a href="https://tedxaou.com/" target="_blank" rel="noopener" class="footer-social" title="Website">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </a>
+      <a href="https://www.facebook.com/TEDxArabOpenUniversity" target="_blank" rel="noopener" class="footer-social" title="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/tedx.aou" target="_blank" rel="noopener" class="footer-social" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/tedxaou/" target="_blank" rel="noopener" class="footer-social" title="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@tedxaou" target="_blank" rel="noopener" class="footer-social" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.78 1.53V6.79a4.85 4.85 0 0 1-1.01-.1z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@TEDxAOU" target="_blank" rel="noopener" class="footer-social" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#000"/></svg>
+      </a>
+    </div>
+
+    <p class="footer-copy">
+      © 2025 TEDxAOU · Arab Open University ·
+      Independently organized TED event ·
+      <a href="https://tedxaou.com/" target="_blank" rel="noopener">tedxaou.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   LOADER
+   ============================================================ */
+(function() {
+  const bar  = document.getElementById('loader-bar');
+  const text = document.getElementById('loader-text');
+  const loader = document.getElementById('loader');
+  const msgs = ['Initializing experience…', 'Loading brand assets…', 'Spreading ideas…'];
+  let idx = 0;
+  let w = 0;
+  bar.style.width = '0%';
+
+  const iv = setInterval(() => {
+    w += Math.random() * 18 + 4;
+    if (w > 100) w = 100;
+    bar.style.width = w + '%';
+    if (w > 40 && idx < 1) { text.textContent = msgs[1]; idx = 1; }
+    if (w > 75 && idx < 2) { text.textContent = msgs[2]; idx = 2; }
+    if (w >= 100) {
+      clearInterval(iv);
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        document.body.classList.add('loaded');
+      }, 400);
+    }
+  }, 80);
+})();
+
+/* ============================================================
+   CURSOR
+   ============================================================ */
+(function() {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  const orb  = document.getElementById('mouse-orb');
+  let mx = 0, my = 0;
+  let rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left  = mx + 'px';
+    dot.style.top   = my + 'px';
+    orb.style.left  = mx + 'px';
+    orb.style.top   = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+})();
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+(function() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class P {
+    constructor() { this.reset(); }
+    reset() {
+      this.x  = Math.random() * W;
+      this.y  = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = (Math.random() - 0.5) * 0.3 - 0.1;
+      this.r  = Math.random() * 1.2 + 0.3;
+      this.o  = Math.random() * 0.5 + 0.1;
+      this.red= Math.random() < 0.15;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.y < -10 || this.x < -10 || this.x > W + 10) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.red
+        ? `rgba(235,0,40,${this.o})`
+        : `rgba(255,255,255,${this.o * 0.4})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 120; i++) particles.push(new P());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================================================
+   NAV SCROLL
+   ============================================================ */
+(function() {
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+})();
+
+/* ============================================================
+   SCROLL REVEAL (Intersection Observer)
+   ============================================================ */
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  els.forEach(el => obs.observe(el));
+})();
+
+/* ============================================================
+   CARD REVEAL
+   ============================================================ */
+(function() {
+  const cards = document.querySelectorAll('.card');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  cards.forEach(c => obs.observe(c));
+})();
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+(function() {
+  const dots = document.querySelectorAll('.scroll-dot');
+  const sections = ['hero','platforms','manifesto'];
+
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY + window.innerHeight / 2;
+    let active = 0;
+    sections.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrolled) active = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+  });
+})();
+
+/* ============================================================
+   MAGNETIC BUTTONS
+   ============================================================ */
+(function() {
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width  / 2;
+      const y = e.clientY - r.top  - r.height / 2;
+      btn.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px) translateY(-2px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+})();
+
+/* ============================================================
+   PARALLAX HERO SHAPES
+   ============================================================ */
+(function() {
+  const geos = document.querySelectorAll('.geo');
+  window.addEventListener('mousemove', e => {
+    const cx = window.innerWidth  / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    geos.forEach((g, i) => {
+      const depth = (i + 1) * 8;
+      g.style.transform = `translate(${dx * depth}px, ${dy * depth}px)`;
+    });
+  });
+})();
+</script>
+</body>
+</html>
